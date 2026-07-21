@@ -6,6 +6,7 @@
     <title>人类丰荣计划 - 运动打卡</title>
     <style>
         :root {
+            /* 默认打卡背景底色（可通过调色盘动态改变） */
             --bg-color: #fcf8f2;
             --card-bg: #fffdf9;
             --text-main: #5c4033;
@@ -13,8 +14,7 @@
             --accent-color: #d4a373;
             
             /* ========================================== */
-            /* 【在这里可以随时替换你想要的数字字体】      */
-            /* 例如换成其它字体：'YourFontName', monospace */
+            /* 【数字字体替换位】可在下方引号内修改为你想要的字体 */
             /* ========================================== */
             --day-font: 'Courier New', Courier, monospace;
         }
@@ -29,6 +29,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            transition: background-color 0.4s ease; /* 背景色切换平滑过渡 */
         }
 
         .container {
@@ -39,6 +40,7 @@
             width: 700px;
             padding: 30px;
             box-sizing: border-box;
+            transition: background-color 0.4s ease, border-color 0.4s ease;
         }
 
         .header {
@@ -111,7 +113,6 @@
             justify-content: center;
             transition: all 0.2s;
             border: 2px dashed transparent;
-            /* 改为 visible，让移到外面的数字也能完美显示 */
             overflow: visible; 
         }
 
@@ -129,14 +130,14 @@
             transform: none;
         }
 
-        /* 日期数字：无背景、无边框、无阴影，完全显示在圆圈正上方，字体可由上方 --day-font 自由替换 */
+        /* 纯净无边框、无背景、完整悬浮在圆圈正上方顶部的日期数字 */
         .day-number {
             position: absolute;
-            top: -6px;
+            top: -8px;
             left: 50%;
             transform: translateX(-50%);
             font-family: var(--day-font);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 900;
             color: #5c4033;
             z-index: 30;
@@ -145,6 +146,7 @@
             border: none;
             box-shadow: none;
             white-space: nowrap;
+            pointer-events: none; /* 防止遮挡点击 */
         }
 
         .day-cell.stamp-stamped {
@@ -243,6 +245,41 @@
             transition: width 0.4s ease;
         }
 
+        /* 悬浮在右下角的调色盘面板样式 */
+        .palette-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(92, 64, 51, 0.12);
+            z-index: 99;
+        }
+        .palette-float span {
+            font-size: 12px;
+            font-weight: bold;
+            color: #8c7365;
+            margin-right: 2px;
+        }
+        .color-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .color-dot:hover {
+            transform: scale(1.15);
+        }
+
+        /* 弹窗样式 */
         .modal {
             display: none;
             position: fixed;
@@ -356,6 +393,18 @@
     </div>
 </div>
 
+<!-- 右下角悬浮调色盘 -->
+<div class="palette-float">
+    <span>🎨 换底色</span>
+    <div class="color-dot" style="background: #fcf8f2;" onclick="setTheme('#fcf8f2', '#fffdf9')" title="奶油白"></div>
+    <div class="color-dot" style="background: #f4f1ea;" onclick="setTheme('#f4f1ea', '#ffffff')" title="燕麦色"></div>
+    <div class="color-dot" style="background: #edf2ed;" onclick="setTheme('#edf2ed', '#f6fbf6')" title="复古绿"></div>
+    <div class="color-dot" style="background: #fcf1ed;" onclick="setTheme('#fcf1ed', '#fff7f4')" title="暖杏粉"></div>
+    <div class="color-dot" style="background: #f7f3eb;" onclick="setTheme('#f7f3eb', '#ffffff')" title="淡卡其"></div>
+    <div class="color-dot" style="background: #eef2f5;" onclick="setTheme('#eef2f5', '#ffffff')" title="雾霾蓝"></div>
+</div>
+
+<!-- 选择运动弹窗 -->
 <div class="modal" id="actionModal">
     <div class="modal-content">
         <h3>选择今日运动打卡</h3>
@@ -375,6 +424,7 @@
     </div>
 </div>
 
+<!-- 设置月度目标弹窗 -->
 <div class="modal" id="goalModal">
     <div class="modal-content">
         <h3>设置本月跑步目标</h3>
@@ -391,21 +441,37 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=4', unit: '公里', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=4', unit: '分钟', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=4', unit: '分钟', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=4', unit: '分钟', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=4', unit: '分钟', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=4', unit: '公里', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=4', unit: '分钟', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=5', unit: '公里', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=5', unit: '分钟', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=5', unit: '分钟', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=5', unit: '分钟', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=5', unit: '分钟', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=5', unit: '公里', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=5', unit: '分钟', type: 'duration' }
     };
 
     let currentDate = new Date(); 
     let checkIns = JSON.parse(localStorage.getItem('sport_checkins')) || {}; 
     let monthlyGoal = localStorage.getItem('monthly_run_goal') ? parseFloat(localStorage.getItem('monthly_run_goal')) : 100;
     
+    // 初始化保存的背景色
+    let savedBg = localStorage.getItem('site_bg_color') || '#fcf8f2';
+    let savedCard = localStorage.getItem('site_card_color') || '#fffdf9';
+    applyTheme(savedBg, savedCard);
+
     let selectedDayKey = null;
     let tempSelectedSport = null;
+
+    function setTheme(bgColor, cardColor) {
+        localStorage.setItem('site_bg_color', bgColor);
+        localStorage.setItem('site_card_color', cardColor);
+        applyTheme(bgColor, cardColor);
+    }
+
+    function applyTheme(bgColor, cardColor) {
+        document.documentElement.style.setProperty('--bg-color', bgColor);
+        document.documentElement.style.setProperty('--card-bg', cardColor);
+    }
 
     function initCalendar() {
         const year = currentDate.getFullYear();
