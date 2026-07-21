@@ -125,46 +125,57 @@
             transform: none;
         }
 
-        /* 日期数字在右上角 */
+        /* 日期数字移到左上角，加粗加大 */
         .day-number {
             position: absolute;
-            top: 4px;
-            right: 8px;
-            font-size: 12px;
-            font-weight: bold;
+            top: 6px;
+            left: 8px;
+            font-size: 13px;
+            font-weight: 800;
             color: #7f6354;
             z-index: 5;
+            background: rgba(255, 253, 249, 0.8);
+            padding: 0 3px;
+            border-radius: 4px;
         }
 
-        /* 盖章完成后的样式 */
+        /* 盖章完成后的样式（让印章铺满格子，更有盖章感） */
         .day-cell.stamp-stamped {
             background: #fffdf9;
-            border: 2px dashed #b5651d;
-            box-shadow: 0 4px 10px rgba(92,64,51,0.08);
+            border: none;
+            box-shadow: 0 4px 12px rgba(92,64,51,0.12);
             border-radius: 50%;
         }
 
-        /* 印章中心内容样式 */
+        /* 印章中心内容样式（放大图片和字号） */
         .stamp-content {
-            width: 85%;
-            height: 85%;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 2;
+            position: relative;
         }
         .stamp-content img {
-            width: 36px;
-            height: 36px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         .stamp-subtext {
-            font-size: 8px;
+            font-size: 10px;
+            font-weight: bold;
             color: #7f6354;
-            transform: scale(0.85);
+            position: absolute;
+            bottom: 6px;
+            background: rgba(255, 253, 249, 0.85);
+            padding: 0 4px;
+            border-radius: 4px;
             white-space: nowrap;
-            margin-top: -3px;
         }
 
         /* 底部统计面板 */
@@ -269,8 +280,8 @@
             transition: 0.2s;
         }
         .option-btn img {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
         }
         .option-btn:hover {
