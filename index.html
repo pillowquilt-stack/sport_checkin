@@ -34,34 +34,33 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* 锁死 3:4 黄金比例的卡片容器，确保网页和截图版式绝对统一 */
+        /* 网页端保持优雅的 3:4 竖屏卡片版式 */
         .container {
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 28px;
+            border-radius: 32px;
             box-shadow: 0 12px 35px rgba(61, 51, 42, 0.06);
-            width: 520px;
-            height: 693px; /* 严格维持 3:4 比例 (520 * 4 / 3 ≈ 693) */
-            padding: 28px 25px;
+            width: 500px;
+            aspect-ratio: 3 / 4;
+            padding: 35px 30px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            overflow: hidden;
         }
 
         .header {
             text-align: center;
         }
         .header h1 {
-            font-size: 24px;
-            margin: 0 0 4px 0;
+            font-size: 26px;
+            margin: 0 0 6px 0;
             letter-spacing: 2px;
             color: var(--text-main);
         }
         .header p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-secondary);
             margin: 0;
             font-weight: 500;
@@ -73,7 +72,7 @@
             align-items: center;
             gap: 20px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 20px;
             color: var(--text-main);
             font-family: var(--day-font);
         }
@@ -81,8 +80,8 @@
             background: none;
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             cursor: pointer;
             color: var(--text-main);
             display: flex;
@@ -103,13 +102,13 @@
             text-align: center;
             font-weight: bold;
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .day-cell {
@@ -139,13 +138,13 @@
             transform: none;
         }
 
-        /* 核心修改：数字变小，精准定位在圆圈的右上角 */
+        /* 日期数字：字小，固定在圆圈右上角 */
         .day-number {
             position: absolute;
-            top: 5px;
-            right: 8px;
+            top: 4px;
+            right: 6px;
             font-family: var(--day-font);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             z-index: 30;
@@ -191,20 +190,20 @@
         .stats-panel {
             background: var(--cell-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 10px 8px;
+            border-radius: 16px;
+            padding: 12px 10px;
             display: flex;
             justify-content: space-around;
             text-align: center;
         }
         .stat-item .num {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: var(--accent-color);
             font-family: var(--day-font);
         }
         .stat-item .label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
             margin-top: 2px;
         }
@@ -212,13 +211,13 @@
         .progress-container {
             background: var(--cell-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 10px 15px;
+            border-radius: 16px;
+            padding: 12px 18px;
         }
         .progress-info {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-main);
             margin-bottom: 6px;
             font-weight: bold;
@@ -255,9 +254,9 @@
             background-color: var(--accent-color);
             color: #fff;
             border: none;
-            padding: 10px 24px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 11px 26px;
+            border-radius: 14px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(200, 138, 89, 0.3);
@@ -409,9 +408,9 @@
     <div class="progress-container">
         <div class="progress-info">
             <span class="progress-title-btn" onclick="openGoalModal()" title="点击设置月度目标">
-                🐾 本月跑步目标 <span id="goalDisplayText" style="font-weight:normal; font-size:11px; color:var(--text-secondary);">(点击设置)</span>
+                🐾 本月跑步目标 <span id="goalDisplayText" style="font-weight:normal; font-size:12px; color:var(--text-secondary);">(点击设置)</span>
             </span>
-            <span id="runProgressText" style="font-family: var(--day-font); font-size: 14px;">0 / 100 km</span>
+            <span id="runProgressText" style="font-family: var(--day-font); font-size: 15px;">0 / 100 km</span>
         </div>
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="runProgressBar"></div>
@@ -471,13 +470,13 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=15', unit: 'km', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=15', unit: 'min', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=15', unit: 'min', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=15', unit: 'min', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=15', unit: 'min', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=15', unit: 'km', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=15', unit: 'min', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=16', unit: 'km', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=16', unit: 'min', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=16', unit: 'min', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=16', unit: 'min', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=16', unit: 'min', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=16', unit: 'km', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=16', unit: 'min', type: 'duration' }
     };
 
     let currentDate = new Date(); 
@@ -710,9 +709,18 @@
         document.getElementById('runProgressBar').style.width = `${percent}%`;
     }
 
+    // 核心修复：强制截图时输出固定的 3:4 竖屏高清比例 (900x1200像素)
     function exportCardAsImage() {
         const card = document.getElementById('captureCard');
-        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
+        html2canvas(card, {
+            scale: 2,
+            width: 900,
+            height: 1200,
+            windowWidth: 900,
+            windowHeight: 1200,
+            useCORS: true,
+            backgroundColor: null
+        }).then(canvas => {
             const link = document.createElement('a');
             link.download = '人类丰荣计划-运动打卡.png';
             link.href = canvas.toDataURL('image/png');
