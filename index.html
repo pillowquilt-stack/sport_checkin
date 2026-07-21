@@ -6,9 +6,10 @@
     <title>人类丰荣计划 - 运动打卡</title>
     <!-- 引入 Google Fonts 的 Abel 字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
+    <!-- 引入 html2canvas 库用于生成高清打卡图 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            /* 默认采用干净清爽的暖白米色系 */
             --bg-color: #f7f5f0;
             --card-bg: #ffffff;
             --text-main: #3d332a;
@@ -17,10 +18,6 @@
             --cell-bg: #faf8f5;
             --accent-color: #c88a59;
             --stamp-bg: #ffffff; 
-            
-            /* ========================================== */
-            /* 【数字字体】单独精准设置为 Abel */
-            /* ========================================== */
             --day-font: 'Abel', sans-serif;
         }
 
@@ -138,7 +135,6 @@
             transform: none;
         }
 
-        /* 独立锁定：日期数字应用 Abel 字体 */
         .day-number {
             position: absolute;
             top: -6px;
@@ -157,7 +153,6 @@
             pointer-events: none;
         }
 
-        /* 已打卡格子：自带独立高亮底衬，确保印章图案绝对清晰 */
         .day-cell.stamp-stamped {
             background: var(--stamp-bg);
             border: none;
@@ -221,6 +216,7 @@
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 15px 20px;
+            margin-bottom: 20px;
         }
         .progress-info {
             display: flex;
@@ -255,6 +251,27 @@
             transition: width 0.4s ease;
         }
 
+        /* 分享按钮样式 */
+        .share-btn-container {
+            text-align: center;
+        }
+        .btn-share {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(200, 138, 89, 0.3);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .btn-share:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
         /* 调色盘样式 */
         .palette-float {
             position: fixed;
@@ -269,7 +286,6 @@
             gap: 8px;
             box-shadow: 0 6px 20px rgba(61, 51, 42, 0.08);
             z-index: 99;
-            transition: background-color 0.4s ease, border-color 0.4s ease;
         }
         .palette-float span {
             font-size: 12px;
@@ -374,7 +390,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="captureCard">
     <div class="header">
         <h1>「人类丰荣计划」</h1>
         <p>/ 备战奥运</p>
@@ -404,6 +420,11 @@
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="runProgressBar"></div>
         </div>
+    </div>
+
+    <!-- 截图保存分享按钮 -->
+    <div class="share-btn-container">
+        <button class="btn-share" onclick="exportCardAsImage()">📸 保存高清打卡图</button>
     </div>
 </div>
 
@@ -455,20 +476,19 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=12', unit: 'km', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=12', unit: 'min', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=12', unit: 'min', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=12', unit: 'min', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=12', unit: 'min', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=12', unit: 'km', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=12', unit: 'min', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=13', unit: 'km', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=13', unit: 'min', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=13', unit: 'min', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=13', unit: 'min', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=13', unit: 'min', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=13', unit: 'km', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=13', unit: 'min', type: 'duration' }
     };
 
     let currentDate = new Date(); 
     let checkIns = JSON.parse(localStorage.getItem('sport_checkins')) || {}; 
     let monthlyGoal = localStorage.getItem('monthly_run_goal') ? parseFloat(localStorage.getItem('monthly_run_goal')) : 100;
     
-    // 初始化颜色配置
     let tBg = localStorage.getItem('t_bg') || '#f7f5f0';
     let tCard = localStorage.getItem('t_card') || '#ffffff';
     let tMain = localStorage.getItem('t_main') || '#3d332a';
@@ -693,6 +713,18 @@
         
         const percent = Math.min(100, (totalRunKm / monthlyGoal) * 100).toFixed(1);
         document.getElementById('runProgressBar').style.width = `${percent}%`;
+    }
+
+    // 核心截图导出函数
+    function exportCardAsImage() {
+        const card = document.getElementById('captureCard');
+        // 放大 2 倍以保证手机/电脑上的绝对高清度
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = '人类丰荣计划-运动打卡.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
     }
 
     initCalendar();
