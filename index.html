@@ -109,6 +109,7 @@
             justify-content: center;
             transition: all 0.2s;
             border: 2px dashed transparent;
+            overflow: hidden;
         }
 
         .day-cell:hover {
@@ -125,57 +126,54 @@
             transform: none;
         }
 
-        /* 日期数字移到左上角，加粗加大 */
+        /* 日期数字：悬浮在左上角，精致小巧 */
         .day-number {
             position: absolute;
-            top: 6px;
-            left: 8px;
-            font-size: 13px;
-            font-weight: 800;
-            color: #7f6354;
-            z-index: 5;
-            background: rgba(255, 253, 249, 0.8);
+            top: 4px;
+            left: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #8c7365;
+            z-index: 10;
+            background: rgba(255, 253, 249, 0.85);
             padding: 0 3px;
             border-radius: 4px;
         }
 
-        /* 盖章完成后的样式（让印章铺满格子，更有盖章感） */
+        /* 盖章完成后的格子（去掉多余边框，让大章直接占满） */
         .day-cell.stamp-stamped {
             background: #fffdf9;
             border: none;
-            box-shadow: 0 4px 12px rgba(92,64,51,0.12);
+            box-shadow: 0 4px 12px rgba(92,64,51,0.1);
             border-radius: 50%;
         }
 
-        /* 印章中心内容样式（放大图片和字号） */
+        /* 印章中心内容样式：将图片放大到占据整个格子的大部分空间 */
         .stamp-content {
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 2;
             position: relative;
         }
         .stamp-content img {
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            height: 90%;
             object-fit: contain;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
+        /* 子文案（公里/分钟）精致地浮在下方 */
         .stamp-subtext {
-            font-size: 10px;
+            position: absolute;
+            bottom: 3px;
+            font-size: 8px;
             font-weight: bold;
             color: #7f6354;
-            position: absolute;
-            bottom: 6px;
-            background: rgba(255, 253, 249, 0.85);
+            background: rgba(255, 253, 249, 0.9);
             padding: 0 4px;
             border-radius: 4px;
             white-space: nowrap;
+            z-index: 5;
         }
 
         /* 底部统计面板 */
