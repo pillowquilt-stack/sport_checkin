@@ -34,15 +34,15 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* 网页端保持优雅的 3:4 竖屏卡片版式 */
+        /* 采用自适应高度但保持完美 3:4 比例视觉的卡片容器，彻底解决拥挤感 */
         .container {
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 32px;
+            border-radius: 28px;
             box-shadow: 0 12px 35px rgba(61, 51, 42, 0.06);
             width: 500px;
             aspect-ratio: 3 / 4;
-            padding: 35px 30px;
+            padding: 28px 25px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -54,13 +54,13 @@
             text-align: center;
         }
         .header h1 {
-            font-size: 26px;
-            margin: 0 0 6px 0;
+            font-size: 24px;
+            margin: 0 0 4px 0;
             letter-spacing: 2px;
             color: var(--text-main);
         }
         .header p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             margin: 0;
             font-weight: 500;
@@ -72,7 +72,7 @@
             align-items: center;
             gap: 20px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
             color: var(--text-main);
             font-family: var(--day-font);
         }
@@ -80,8 +80,8 @@
             background: none;
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
             color: var(--text-main);
             display: flex;
@@ -102,13 +102,13 @@
             text-align: center;
             font-weight: bold;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .day-cell {
@@ -138,7 +138,7 @@
             transform: none;
         }
 
-        /* 日期数字：字小，固定在圆圈右上角 */
+        /* 日期数字：精准固定在圆圈右上角，字小不抢戏 */
         .day-number {
             position: absolute;
             top: 4px;
@@ -190,20 +190,20 @@
         .stats-panel {
             background: var(--cell-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 12px 10px;
+            border-radius: 12px;
+            padding: 10px 6px;
             display: flex;
             justify-content: space-around;
             text-align: center;
         }
         .stat-item .num {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: var(--accent-color);
             font-family: var(--day-font);
         }
         .stat-item .label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             margin-top: 2px;
         }
@@ -211,15 +211,15 @@
         .progress-container {
             background: var(--cell-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 12px 18px;
+            border-radius: 12px;
+            padding: 10px 15px;
         }
         .progress-info {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-main);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: bold;
         }
         .progress-title-btn {
@@ -234,8 +234,8 @@
         }
         .progress-bar-bg {
             background: var(--border-color);
-            height: 10px;
-            border-radius: 5px;
+            height: 8px;
+            border-radius: 4px;
             overflow: hidden;
             position: relative;
         }
@@ -243,7 +243,7 @@
             background: linear-gradient(90deg, #c88a59, #e0a96d);
             height: 100%;
             width: 0%;
-            border-radius: 5px;
+            border-radius: 4px;
             transition: width 0.4s ease;
         }
 
@@ -254,9 +254,9 @@
             background-color: var(--accent-color);
             color: #fff;
             border: none;
-            padding: 11px 26px;
-            border-radius: 14px;
-            font-size: 14px;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(200, 138, 89, 0.3);
@@ -408,16 +408,16 @@
     <div class="progress-container">
         <div class="progress-info">
             <span class="progress-title-btn" onclick="openGoalModal()" title="点击设置月度目标">
-                🐾 本月跑步目标 <span id="goalDisplayText" style="font-weight:normal; font-size:12px; color:var(--text-secondary);">(点击设置)</span>
+                🐾 本月跑步目标 <span id="goalDisplayText" style="font-weight:normal; font-size:11px; color:var(--text-secondary);">(点击设置)</span>
             </span>
-            <span id="runProgressText" style="font-family: var(--day-font); font-size: 15px;">0 / 100 km</span>
+            <span id="runProgressText" style="font-family: var(--day-font); font-size: 14px;">0 / 100 km</span>
         </div>
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="runProgressBar"></div>
         </div>
     </div>
 
-    <div class="share-btn-container">
+    <div class="share-btn-container" id="shareBtnContainer">
         <button class="btn-share" onclick="exportCardAsImage()">📸 保存高清打卡图</button>
     </div>
 </div>
@@ -470,13 +470,13 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=16', unit: 'km', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=16', unit: 'min', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=16', unit: 'min', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=16', unit: 'min', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=16', unit: 'min', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=16', unit: 'km', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=16', unit: 'min', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=17', unit: 'km', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=17', unit: 'min', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=17', unit: 'min', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=17', unit: 'min', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=17', unit: 'min', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=17', unit: 'km', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=17', unit: 'min', type: 'duration' }
     };
 
     let currentDate = new Date(); 
@@ -709,9 +709,14 @@
         document.getElementById('runProgressBar').style.width = `${percent}%`;
     }
 
-    // 核心修复：强制截图时输出固定的 3:4 竖屏高清比例 (900x1200像素)
+    // 核心修复：截图前自动隐藏保存按钮，截图完成后立刻恢复，并锁定 3:4 竖屏比例 (900x1200)
     function exportCardAsImage() {
         const card = document.getElementById('captureCard');
+        const btnContainer = document.getElementById('shareBtnContainer');
+        
+        // 截图前瞬间隐藏保存按钮
+        btnContainer.style.display = 'none';
+
         html2canvas(card, {
             scale: 2,
             width: 900,
@@ -721,10 +726,17 @@
             useCORS: true,
             backgroundColor: null
         }).then(canvas => {
+            // 恢复保存按钮显示
+            btnContainer.style.display = 'block';
+
             const link = document.createElement('a');
             link.download = '人类丰荣计划-运动打卡.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }).catch(err => {
+            // 异常时也确保按钮恢复
+            btnContainer.style.display = 'block';
+            console.error(err);
         });
     }
 
