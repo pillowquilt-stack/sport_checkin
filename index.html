@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>人类丰荣计划 - 运动打卡</title>
+    <!-- 引入 Google Fonts 的 Abel 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
     <style>
         :root {
             /* 默认采用干净清爽的暖白米色系 */
@@ -17,9 +19,9 @@
             --stamp-bg: #ffffff; 
             
             /* ========================================== */
-            /* 【炫酷英文字体】采用极具个性的艺术/先锋大写风格 */
+            /* 【数字字体】单独精准设置为 Abel */
             /* ========================================== */
-            --day-font: 'Impact', 'Arial Black', sans-serif;
+            --day-font: 'Abel', sans-serif;
         }
 
         body {
@@ -72,10 +74,6 @@
             font-size: 18px;
             color: var(--text-main);
         }
-        .month-nav span {
-            font-family: var(--day-font); /* 月份英文也同步应用先锋字体 */
-            letter-spacing: 1px;
-        }
         .month-nav button {
             background: none;
             border: 1px solid var(--border-color);
@@ -103,7 +101,6 @@
             color: var(--text-secondary);
             margin-bottom: 10px;
             font-size: 14px;
-            font-family: var(--day-font); /* 周几字母同步应用 */
         }
 
         .calendar-grid {
@@ -141,15 +138,15 @@
             transform: none;
         }
 
-        /* 日期数字：应用炫酷硬核字体并微调视觉 */
+        /* 独立锁定：日期数字应用 Abel 字体 */
         .day-number {
             position: absolute;
             top: -6px;
             left: 50%;
             transform: translateX(-50%);
             font-family: var(--day-font);
-            font-size: 14px;
-            letter-spacing: -0.5px;
+            font-size: 15px;
+            font-weight: 400;
             color: var(--text-main);
             z-index: 30;
             background: transparent;
@@ -187,7 +184,8 @@
             position: absolute;
             bottom: 2px;
             font-family: var(--day-font);
-            font-size: 9px;
+            font-size: 10px;
+            font-weight: 400;
             color: var(--text-main);
             background: var(--card-bg);
             padding: 0 4px;
@@ -211,7 +209,6 @@
             font-size: 18px;
             font-weight: bold;
             color: var(--accent-color);
-            font-family: var(--day-font);
         }
         .stat-item .label {
             font-size: 12px;
@@ -458,13 +455,13 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=10', unit: '公里', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=10', unit: '分钟', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=10', unit: '分钟', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=10', unit: '分钟', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=10', unit: '分钟', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=10', unit: '公里', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=10', unit: '分钟', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=11', unit: '公里', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=11', unit: '分钟', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=11', unit: '分钟', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=11', unit: '分钟', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=11', unit: '分钟', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=11', unit: '公里', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=11', unit: '分钟', type: 'duration' }
     };
 
     let currentDate = new Date(); 
@@ -513,11 +510,6 @@
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         
-        const monthNames = ["July", "August", "September", "October", "November", "December", "January", "February", "March", "April", "May", "June"];
-        // 修正英文月份展示
-        const realMonthNames = ["July", "August", "September", "October", "November", "December", "January", "February", "March", "April", "May", "June"]; // 为免混乱直接标准映射
-        const correctMonthNames = ["July", "August", "September", "October", "November", "December", "January", "February", "March", "April", "May", "June"];
-        // 使用标准月份英文数组
         const standardMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         document.getElementById('currentMonthYear').innerText = `${standardMonths[month]} ${year}`;
 
