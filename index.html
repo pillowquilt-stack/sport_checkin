@@ -95,12 +95,12 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .day-cell {
             aspect-ratio: 1;
-            background: rgba(230, 213, 195, 0.15);
+            background: rgba(230, 213, 195, 0.1);
             border-radius: 50%;
             position: relative;
             cursor: pointer;
@@ -133,21 +133,38 @@
             font-size: 12px;
             font-weight: bold;
             color: #7f6354;
-            z-index: 2;
+            z-index: 5;
+        }
+
+        /* 仿图中的复古手帐盖章效果（双层虚线复古圆框） */
+        .day-cell.stamp-stamped {
+            background: #fffdf9;
+            border: 2px dashed #8b5a2b;
+            box-shadow: inset 0 0 0 3px #fffdf9, inset 0 0 0 4px rgba(139, 90, 43, 0.3), 0 4px 10px rgba(92,64,51,0.1);
+            border-radius: 50%;
         }
 
         /* 印章中心内容样式 */
         .stamp-content {
-            font-size: 11px;
-            text-align: center;
-            color: #5c4033;
+            width: 80%;
+            height: 80%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 2;
         }
-        .stamp-content span {
-            font-size: 20px; /* 图标/emoji大小 */
+        .stamp-content img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+        .stamp-subtext {
+            font-size: 8px;
+            color: #7f6354;
+            transform: scale(0.85);
+            white-space: nowrap;
+            margin-top: -2px;
         }
 
         /* 底部统计面板 */
@@ -159,6 +176,7 @@
             display: flex;
             justify-content: space-around;
             text-align: center;
+            margin-bottom: 20px;
         }
         .stat-item .num {
             font-size: 18px;
@@ -169,6 +187,46 @@
             font-size: 12px;
             color: #8c7365;
             margin-top: 4px;
+        }
+
+        /* 跑步进度条面板 */
+        .progress-container {
+            background: rgba(230, 213, 195, 0.15);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px 20px;
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #5c4033;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .progress-title-btn {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+        .progress-title-btn:hover {
+            opacity: 0.7;
+        }
+        .progress-bar-bg {
+            background: #e6d5c3;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #e07a5f, #f4a261);
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.4s ease;
         }
 
         /* 弹窗样式 */
@@ -186,7 +244,7 @@
             padding: 25px;
             border-radius: 20px;
             border: 2px solid var(--border-color);
-            width: 350px;
+            width: 340px;
             text-align: center;
         }
         .modal-content h3 { margin-top: 0; margin-bottom: 15px;}
@@ -200,30 +258,61 @@
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 10px;
+            padding: 8px 5px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             transition: 0.2s;
+        }
+        .option-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
         }
         .option-btn:hover {
             background: var(--accent-color);
             color: #fff;
         }
-        .close-modal {
-            background: #ccc;
+        
+        .input-section {
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        .input-section input {
+            width: 80px;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            margin-left: 5px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .action-btn {
             border: none;
             padding: 6px 15px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 13px;
         }
+        .btn-confirm { background: #e07a5f; color: #fff; }
+        .btn-clear { background: #d3d3d3; color: #5c4033; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>「人类丰荣计划」</h1>
+        <h1>🐾 运动打卡盖章 ♥</h1>
         <p>/ 备战奥运</p>
     </div>
 
@@ -237,13 +326,22 @@
         <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
     </div>
 
-    <div class="calendar-grid" id="calendarGrid">
-        <!-- 动态生成日历格子 -->
-    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
 
     <!-- 底部统计 -->
-    <div class="stats-panel" id="statsPanel">
-        <!-- 动态生成统计 -->
+    <div class="stats-panel" id="statsPanel"></div>
+
+    <!-- 跑步进度条 -->
+    <div class="progress-container">
+        <div class="progress-info">
+            <span class="progress-title-btn" onclick="openGoalModal()" title="点击设置月度目标">
+                🐾 本月跑步目标 <span id="goalDisplayText" style="font-weight:normal; font-size:12px; color:#8c7365;">(点击设置)</span>
+            </span>
+            <span id="runProgressText">0 / 100 公里</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="runProgressBar"></div>
+        </div>
     </div>
 </div>
 
@@ -251,83 +349,107 @@
 <div class="modal" id="actionModal">
     <div class="modal-content">
         <h3>选择今日运动打卡</h3>
-        <div class="options-grid" id="optionsGrid">
-            <!-- 运动选项 -->
+        <div class="options-grid" id="optionsGrid"></div>
+        
+        <div class="input-section" id="inputSection">
+            <span id="inputLabel">距离：</span>
+            <input type="number" id="detailValue" step="0.1" placeholder="例如 5">
+            <span id="inputUnit">公里</span>
         </div>
-        <button class="close-modal" onclick="closeModal()">取消 / 清除</button>
+
+        <div class="modal-actions">
+            <button class="action-btn btn-confirm" id="confirmBtn" style="display:none;" onclick="saveCheckIn()">保存打卡</button>
+            <button class="action-btn btn-clear" onclick="clearCheckIn()">清除打卡</button>
+            <button class="action-btn" style="background:#eee;" onclick="closeModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 设置月度目标弹窗 -->
+<div class="modal" id="goalModal">
+    <div class="modal-content">
+        <h3>设置本月跑步目标</h3>
+        <div style="margin-bottom: 15px; font-size: 13px; color:#8c7365;">输入本月计划完成的总公里数：</div>
+        <div style="margin-bottom: 20px;">
+            <input type="number" id="goalInput" step="1" style="width: 100px; padding: 6px; border: 1px solid var(--border-color); border-radius: 6px; text-align: center; font-size: 16px;" placeholder="100"> 公里
+        </div>
+        <div class="modal-actions">
+            <button class="action-btn btn-confirm" onclick="saveGoal()">保存目标</button>
+            <button class="action-btn" style="background:#eee;" onclick="closeGoalModal()">取消</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 定义运动类型及其图标 (可对应替换成图2的可爱猫咪图片)
+    // 在这里配置你的猫咪印章图片路径 (可以把图片和 html 放在同级目录下，写对应的文件名)
     const sportTypes = {
-        'run': { name: '跑步', icon: '🏃' },
-        'dance': { name: '跳舞', icon: '💃' },
-        'badminton': { name: '羽毛球', icon: '🏸' },
-        'fitness': { name: '健身', icon: '💪' },
-        'yoga': { name: '瑜伽', icon: '🧘' },
-        'walk': { name: '散步', icon: '🐾' },
-        'bike': { name: '骑车', icon: '🚴' },
-        'swim': { name: '游泳', icon: '🏊' },
-        'stretch': { name: '拉伸', icon: '🐈' },
-        'rest': { name: '休息', icon: '☕' }
+        'run': { name: '跑步', icon: 'run.png', unit: '公里', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png', unit: '分钟', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png', unit: '分钟', type: 'duration' },
+        'fitness': { name: '健身', icon: 'fitness.png', unit: '分钟', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png', unit: '分钟', type: 'duration' },
+        'walk': { name: '散步', icon: 'walk.png', unit: '公里', type: 'distance' },
+        'bike': { name: '骑车', icon: 'bike.png', unit: '公里', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png', unit: '分钟', type: 'duration' },
+        'stretch': { name: '拉伸', icon: 'stretch.png', unit: '分钟', type: 'duration' },
+        'rest': { name: '休息', icon: 'rest.png', unit: '分钟', type: 'duration' }
     };
 
-    let currentDate = new Date(2026, 6, 1); // 默认 2026年7月
-    let checkIns = {}; // 存储打卡数据，格式: "2026-7-21": "run"
+    let currentDate = new Date(2026, 6, 1); 
+    let checkIns = JSON.parse(localStorage.getItem('sport_checkins')) || {}; 
+    let monthlyGoal = localStorage.getItem('monthly_run_goal') ? parseFloat(localStorage.getItem('monthly_run_goal')) : 100;
+    
     let selectedDayKey = null;
+    let tempSelectedSport = null;
 
     function initCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         
-        // 设置顶部年月显示
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         document.getElementById('currentMonthYear').innerText = `${monthNames[month]} ${year}`;
 
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
 
-        // 获取当月第一天是星期几 (调整周一为一周的第一天)
         let firstDayIndex = new Date(year, month, 1).getDay();
         firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; 
 
-        // 获取当月总天数
         const totalDays = new Date(year, month + 1, 0).getDate();
 
-        // 填充空白前置格子
         for (let i = 0; i < firstDayIndex; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'day-cell empty';
             grid.appendChild(emptyCell);
         }
 
-        // 填充日期格子
         for (let day = 1; day <= totalDays; day++) {
             const cell = document.createElement('div');
             cell.className = 'day-cell';
             
             const dateKey = `${year}-${month}-${day}`;
             
-            // 右上角日期数字
             const numSpan = document.createElement('span');
             numSpan.className = 'day-number';
             numSpan.innerText = day;
             cell.appendChild(numSpan);
 
-            // 如果这天有打卡记录，渲染中心印章
             if (checkIns[dateKey]) {
-                const sport = sportTypes[checkIns[dateKey]];
-                const stampDiv = document.createElement('div');
-                stampDiv.className = 'stamp-content';
-                stampDiv.innerHTML = `<span>${sport.icon}</span>`;
-                cell.appendChild(stampDiv);
+                const record = checkIns[dateKey];
+                const sport = sportTypes[record.sport];
                 
-                // 简单的背景区分色（可以根据类别自定义）
-                cell.style.background = 'rgba(212, 163, 115, 0.25)';
+                if (sport) {
+                    cell.classList.add('stamp-stamped');
+
+                    const stampDiv = document.createElement('div');
+                    stampDiv.className = 'stamp-content';
+                    
+                    let subTextStr = (record.value !== undefined && record.value !== '') ? `${record.value}${sport.unit}` : '';
+                    stampDiv.innerHTML = `<img src="${sport.icon}" alt="${sport.name}"><span class="stamp-subtext">${subTextStr}</span>`;
+                    cell.appendChild(stampDiv);
+                }
             }
 
-            // 点击弹出打卡选择
             cell.onclick = () => openModal(dateKey);
             grid.appendChild(cell);
         }
@@ -342,6 +464,11 @@
 
     function openModal(dateKey) {
         selectedDayKey = dateKey;
+        tempSelectedSport = null;
+        document.getElementById('inputSection').style.display = 'none';
+        document.getElementById('confirmBtn').style.display = 'none';
+        document.getElementById('detailValue').value = '';
+
         const modal = document.getElementById('actionModal');
         const grid = document.getElementById('optionsGrid');
         grid.innerHTML = '';
@@ -349,16 +476,53 @@
         for (let key in sportTypes) {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.innerHTML = `${sportTypes[key].icon} <br>${sportTypes[key].name}`;
-            btn.onclick = () => selectSport(key);
+            btn.innerHTML = `<img src="${sportTypes[key].icon}" alt="${sportTypes[key].name}"><span>${sportTypes[key].name}</span>`;
+            btn.onclick = () => selectSportOption(key);
             grid.appendChild(btn);
         }
         modal.style.display = 'flex';
     }
 
-    function selectSport(sportKey) {
-        if (selectedDayKey) {
-            checkIns[selectedDayKey] = sportKey;
+    function selectSportOption(sportKey) {
+        tempSelectedSport = sportKey;
+        const sport = sportTypes[sportKey];
+
+        const inputSection = document.getElementById('inputSection');
+        const inputLabel = document.getElementById('inputLabel');
+        const inputUnit = document.getElementById('inputUnit');
+        const detailInput = document.getElementById('detailValue');
+
+        inputLabel.innerText = sport.type === 'distance' ? '运动距离：' : '运动时长：';
+        inputUnit.innerText = sport.unit;
+        
+        if (checkIns[selectedDayKey] && checkIns[selectedDayKey].sport === sportKey) {
+            detailInput.value = checkIns[selectedDayKey].value !== undefined ? checkIns[selectedDayKey].value : '';
+        } else {
+            detailInput.value = '';
+        }
+
+        inputSection.style.display = 'block';
+        document.getElementById('confirmBtn').style.display = 'inline-block';
+    }
+
+    function saveCheckIn() {
+        if (!selectedDayKey || !tempSelectedSport) return;
+        const val = document.getElementById('detailValue').value;
+
+        checkIns[selectedDayKey] = {
+            sport: tempSelectedSport,
+            value: val !== '' ? parseFloat(val) : 0
+        };
+
+        localStorage.setItem('sport_checkins', JSON.stringify(checkIns));
+        closeModal();
+        initCalendar();
+    }
+
+    function clearCheckIn() {
+        if (selectedDayKey && checkIns[selectedDayKey]) {
+            delete checkIns[selectedDayKey];
+            localStorage.setItem('sport_checkins', JSON.stringify(checkIns));
         }
         closeModal();
         initCalendar();
@@ -366,12 +530,31 @@
 
     function closeModal() {
         document.getElementById('actionModal').style.display = 'none';
-        // 如果想在点击取消时清除打卡，可以在这里处理，目前点击取消仅关闭弹窗
+    }
+
+    function openGoalModal() {
+        document.getElementById('goalInput').value = monthlyGoal;
+        document.getElementById('goalModal').style.display = 'flex';
+    }
+
+    function closeGoalModal() {
+        document.getElementById('goalModal').style.display = 'none';
+    }
+
+    function saveGoal() {
+        const val = document.getElementById('goalInput'].value;
+        if (val !== '' && !isNaN(val)) {
+            monthlyGoal = parseFloat(val);
+            localStorage.setItem('monthly_run_goal', monthlyGoal);
+        }
+        closeGoalModal();
+        initCalendar();
     }
 
     function updateStats(year, month, totalDays) {
         let activeDays = 0;
         let totalCount = 0;
+        let totalRunKm = 0;
         let counts = {};
 
         for (let key in sportTypes) counts[key] = 0;
@@ -381,7 +564,12 @@
             if (checkIns[dateKey]) {
                 activeDays++;
                 totalCount++;
-                counts[checkIns[dateKey]]++;
+                const record = checkIns[dateKey];
+                counts[record.sport] = (counts[record.sport] || 0) + 1;
+
+                if (record.sport === 'run') {
+                    totalRunKm += Number(record.value || 0);
+                }
             }
         }
 
@@ -389,14 +577,19 @@
         statsPanel.innerHTML = `
             <div class="stat-item"><div class="num">${activeDays}</div><div class="label">运动天数</div></div>
             <div class="stat-item"><div class="num">${totalCount}</div><div class="label">打卡次数</div></div>
-            <div class="stat-item"><div class="num">${counts['run']}</div><div class="label">跑步</div></div>
-            <div class="stat-item"><div class="num">${counts['dance']}</div><div class="label">舞蹈</div></div>
-            <div class="stat-item"><div class="num">${counts['badminton']}</div><div class="label">羽毛球</div></div>
-            <div class="stat-item"><div class="num">${counts['rest']}</div><div class="label">休息</div></div>
+            <div class="stat-item"><div class="num">${counts['run'] || 0}</div><div class="label">跑步</div></div>
+            <div class="stat-item"><div class="num">${counts['dance'] || 0}</div><div class="label">舞蹈</div></div>
+            <div class="stat-item"><div class="num">${counts['badminton'] || 0}</div><div class="label">羽毛球</div></div>
+            <div class="stat-item"><div class="num">${counts['rest'] || 0}</div><div class="label">休息</div></div>
         `;
+
+        document.getElementById('goalDisplayText').innerText = `(目标: ${monthlyGoal} 公里)`;
+        document.getElementById('runProgressText').innerText = `${totalRunKm.toFixed(1)} / ${monthlyGoal} 公里`;
+        
+        const percent = Math.min(100, (totalRunKm / monthlyGoal) * 100).toFixed(1);
+        document.getElementById('runProgressBar').style.width = `${percent}%`;
     }
 
-    // 初始化运行
     initCalendar();
 </script>
 
