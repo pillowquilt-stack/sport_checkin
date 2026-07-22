@@ -6,10 +6,9 @@
     <title>人类丰荣计划 - 运动打卡</title>
     <!-- 引入 Google Fonts 的 Abel 字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
+    <!-- 引入 html2canvas 库用于生成高清图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
-        /* ==========================================================
-           1. 声明并引入中文字体：FuLuLingGanHeChaTi-2.ttf
-           ========================================================== */
         @font-face {
             font-family: 'FuLuLingGanHeChaTi';
             src: url('./FuLuLingGanHeChaTi-2.ttf') format('truetype');
@@ -44,7 +43,6 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* 锁死完美的 3:4 竖屏比例卡片，呼吸感十足 */
         .container {
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
@@ -61,7 +59,6 @@
             transition: all 0.3s ease;
         }
 
-        /* 顶部区域改为 Flex 左右布局：左侧标题左对齐，右侧月份靠右 */
         .header {
             display: flex;
             justify-content: space-between;
@@ -86,7 +83,6 @@
             font-weight: normal;
         }
 
-        /* 右上角月份切换模块 */
         .month-nav {
             display: flex;
             align-items: center;
@@ -166,7 +162,6 @@
             transform: none;
         }
 
-        /* 日期数字：移到圆圈外部右上角 */
         .day-number {
             position: absolute;
             top: -6px;
@@ -281,11 +276,16 @@
             transition: width 0.4s ease;
         }
 
-        /* 左上角海报模式入口 */
-        .poster-mode-trigger {
+        /* 悬浮操作按钮区 */
+        .float-btns {
             position: fixed;
             top: 25px;
             left: 25px;
+            display: flex;
+            gap: 10px;
+            z-index: 99;
+        }
+        .float-btn {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 20px;
@@ -295,13 +295,20 @@
             color: var(--text-secondary);
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(61, 51, 42, 0.05);
-            z-index: 99;
             transition: all 0.2s;
             font-family: var(--cn-font);
         }
-        .poster-mode-trigger:hover {
+        .float-btn:hover {
             border-color: var(--accent-color);
             color: var(--accent-color);
+        }
+        .float-btn.primary {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+        }
+        .float-btn.primary:hover {
+            opacity: 0.9;
         }
 
         /* 右下角悬浮调色盘 */
@@ -318,14 +325,11 @@
             gap: 8px;
             box-shadow: 0 6px 20px rgba(61, 51, 42, 0.08);
             z-index: 99;
-            transition: opacity 0.3s;
             font-family: var(--cn-font);
         }
         .palette-float span {
             font-size: 13px;
-            font-weight: normal;
             color: var(--text-secondary);
-            margin-right: 2px;
         }
         .color-dot {
             width: 22px;
@@ -333,46 +337,10 @@
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid rgba(0,0,0,0.08);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.2s;
         }
         .color-dot:hover {
             transform: scale(1.15);
-        }
-
-        /* 顶部悬浮的海报模式专属提示条（默认隐藏） */
-        .poster-tip-bar {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: var(--card-bg);
-            border: 2px solid var(--accent-color);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 14px;
-            font-weight: normal;
-            color: var(--text-main);
-            z-index: 1000;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: var(--cn-font);
-        }
-        .poster-tip-bar.show {
-            transform: translateX(-50%) translateY(0);
-        }
-        .exit-poster-btn {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: var(--cn-font);
         }
 
         /* 弹窗样式 */
@@ -414,7 +382,6 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            transition: 0.2s;
             font-family: var(--cn-font);
         }
         .option-btn img {
@@ -438,7 +405,6 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             text-align: center;
-            margin-left: 5px;
             background: var(--card-bg);
             color: var(--text-main);
             font-family: var(--cn-font);
@@ -463,13 +429,9 @@
 </head>
 <body>
 
-<!-- 左上角海报模式入口 -->
-<button class="poster-mode-trigger" id="posterModeTrigger" onclick="enterPosterMode()">✨ 进入截图海报模式</button>
-
-<!-- 顶部海报模式专属提示条 -->
-<div class="poster-tip-bar" id="posterTipBar">
-    <span>✨ 已进入纯净海报模式，请直接截图卡片</span>
-    <button class="exit-poster-btn" onclick="exitPosterMode()">退出模式</button>
+<!-- 左上角操作按钮：一键导出超高清图 -->
+<div class="float-btns">
+    <button class="float-btn primary" onclick="exportHighResImage()">📥 一键下载超高清海报</button>
 </div>
 
 <div class="container" id="captureCard">
@@ -478,7 +440,6 @@
             <h1>「人类丰荣计划」</h1>
             <p>/ 备战奥运</p>
         </div>
-        <!-- 月份切换模块（靠右对齐，与左侧标题错开不重叠） -->
         <div class="month-nav">
             <button onclick="changeMonth(-1)">‹</button>
             <span id="currentMonthYear">July 2026</span>
@@ -808,20 +769,21 @@
         document.getElementById('runProgressBar').style.width = `${percent}%`;
     }
 
-    function enterPosterMode() {
-        document.getElementById('posterModeTrigger').style.opacity = '0';
-        document.getElementById('posterModeTrigger').style.pointerEvents = 'none';
-        document.getElementById('paletteFloat').style.opacity = '0';
-        document.getElementById('paletteFloat').style.pointerEvents = 'none';
-        document.getElementById('posterTipBar').classList.add('show');
-    }
-
-    function exitPosterMode() {
-        document.getElementById('posterModeTrigger').style.opacity = '1';
-        document.getElementById('posterModeTrigger').style.pointerEvents = 'auto';
-        document.getElementById('paletteFloat').style.opacity = '1';
-        document.getElementById('paletteFloat').style.pointerEvents = 'auto';
-        document.getElementById('posterTipBar').classList.remove('show');
+    /* 核心高清截图导出函数 */
+    function exportHighResImage() {
+        const card = document.getElementById('captureCard');
+        
+        // 放大 3 倍渲染，保证导出的图片极其清晰、没有锯齿
+        html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: null
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = '人类丰荣计划-运动打卡.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
     }
 
     initCalendar();
