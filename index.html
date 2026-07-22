@@ -107,9 +107,9 @@
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 14px 10px; /* 增加上下行间距，给移到圈外的数字留出空间 */
-            margin-top: 6px;
-            margin-bottom: 6px;
+            gap: 16px 10px; /* 增加上下间距，给下方文字留出展示空间 */
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
 
         .day-cell {
@@ -139,7 +139,7 @@
             transform: none;
         }
 
-        /* 日期数字：移到圆圈外部的右上角，彻底告别重叠 */
+        /* 日期数字：移到圆圈外部右上角 */
         .day-number {
             position: absolute;
             top: -6px;
@@ -168,25 +168,30 @@
             justify-content: center;
             position: relative;
             z-index: 5;
+            overflow: visible; /* 允许章子适当放大 */
         }
+        /* 章子放大至撑满甚至略微溢出圆形边界 */
         .stamp-content img {
-            width: 85%;
-            height: 85%;
+            width: 105%;
+            height: 105%;
             object-fit: contain;
         }
+
+        /* 时间/距离文字放到圆圈下方，带有清晰的底衬确保不与背景粘连 */
         .stamp-subtext {
             position: absolute;
-            bottom: 2px;
+            bottom: -8px;
             font-family: var(--day-font);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-main);
             background: var(--card-bg);
-            padding: 0 4px;
-            border-radius: 4px;
+            padding: 1px 5px;
+            border-radius: 6px;
             white-space: nowrap;
-            z-index: 15;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            z-index: 20;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
         }
 
         .stats-panel {
@@ -480,7 +485,7 @@
 <!-- 选择运动弹窗 -->
 <div class="modal" id="actionModal">
     <div class="modal-content">
-        <h3>选择今日运动打卡</h3>
+        <h3>选择今日打卡项目</h3>
         <div class="options-grid" id="optionsGrid"></div>
         
         <div class="input-section" id="inputSection">
@@ -514,13 +519,14 @@
 
 <script>
     const sportTypes = {
-        'run': { name: '跑步', icon: 'run.png?v=33', unit: 'km', type: 'distance' },
-        'dance': { name: '跳舞', icon: 'dance.png?v=33', unit: 'min', type: 'duration' },
-        'badminton': { name: '羽毛球', icon: 'badminton.png?v=33', unit: 'min', type: 'duration' },
-        'workout': { name: '健身', icon: 'workout.png?v=33', unit: 'min', type: 'duration' },
-        'yoga': { name: '瑜伽', icon: 'yoga.png?v=33', unit: 'min', type: 'duration' },
-        'bike': { name: '骑车', icon: 'bike.png?v=33', unit: 'km', type: 'distance' },
-        'swim': { name: '游泳', icon: 'swim.png?v=33', unit: 'min', type: 'duration' }
+        'run': { name: '跑步', icon: 'run.png?v=34', unit: 'km', type: 'distance' },
+        'dance': { name: '跳舞', icon: 'dance.png?v=34', unit: 'min', type: 'duration' },
+        'badminton': { name: '羽毛球', icon: 'badminton.png?v=34', unit: 'min', type: 'duration' },
+        'workout': { name: '健身', icon: 'workout.png?v=34', unit: 'min', type: 'duration' },
+        'yoga': { name: '瑜伽', icon: 'yoga.png?v=34', unit: 'min', type: 'duration' },
+        'bike': { name: '骑车', icon: 'bike.png?v=34', unit: 'km', type: 'distance' },
+        'swim': { name: '游泳', icon: 'swim.png?v=34', unit: 'min', type: 'duration' },
+        'rest': { name: '休息', icon: 'rest.png?v=34', unit: '', type: 'none' }
     };
 
     let currentDate = new Date(); 
@@ -606,8 +612,13 @@
                     const stampDiv = document.createElement('div');
                     stampDiv.className = 'stamp-content';
                     
-                    let subTextStr = (record.value !== undefined && record.value !== '') ? `${record.value}${sport.unit}` : '';
-                    stampDiv.innerHTML = `<img src="${sport.icon}" alt="${sport.name}"><span class="stamp-subtext">${subTextStr}</span>`;
+                    let subTextStr = '';
+                    if (sport.type !== 'none' && record.value !== undefined && record.value !== '') {
+                        subTextStr = `${record.value}${sport.unit}`;
+                    }
+
+                    let subTextHTML = subTextStr ? `<span class="stamp-subtext">${subTextStr}</span>` : '';
+                    stampDiv.innerHTML = `<img src="${sport.icon}" alt="${sport.name}">${subTextHTML}`;
                     cell.appendChild(stampDiv);
                 }
             }
@@ -654,22 +665,31 @@
         const inputUnit = document.getElementById('inputUnit');
         const detailInput = document.getElementById('detailValue');
 
-        inputLabel.innerText = sport.type === 'distance' ? '运动距离：' : '运动时长：';
-        inputUnit.innerText = sport.unit;
-        
-        if (checkIns[selectedDayKey] && checkIns[selectedDayKey].sport === sportKey) {
-            detailInput.value = checkIns[selectedDayKey].value !== undefined ? checkIns[selectedDayKey].value : '';
+        if (sport.type === 'none') {
+            inputSection.style.display = 'none';
+            document.getElementById('confirmBtn').style.display = 'inline-block';
         } else {
-            detailInput.value = '';
-        }
+            inputLabel.innerText = sport.type === 'distance' ? '运动距离：' : '运动时长：';
+            inputUnit.innerText = sport.unit;
+            
+            if (checkIns[selectedDayKey] && checkIns[selectedDayKey].sport === sportKey) {
+                detailInput.value = checkIns[selectedDayKey].value !== undefined ? checkIns[selectedDayKey].value : '';
+            } else {
+                detailInput.value = '';
+            }
 
-        inputSection.style.display = 'block';
-        document.getElementById('confirmBtn').style.display = 'inline-block';
+            inputSection.style.display = 'block';
+            document.getElementById('confirmBtn').style.display = 'inline-block';
+        }
     }
 
     function saveCheckIn() {
         if (!selectedDayKey || !tempSelectedSport) return;
-        const val = document.getElementById('detailValue').value;
+        const sport = sportTypes[tempSelectedSport];
+        let val = '';
+        if (sport.type !== 'none') {
+            val = document.getElementById('detailValue').value;
+        }
 
         checkIns[selectedDayKey] = {
             sport: tempSelectedSport,
@@ -742,7 +762,7 @@
             <div class="stat-item"><div class="num">${counts['run'] || 0}</div><div class="label">跑步</div></div>
             <div class="stat-item"><div class="num">${counts['dance'] || 0}</div><div class="label">舞蹈</div></div>
             <div class="stat-item"><div class="num">${counts['badminton'] || 0}</div><div class="label">羽毛球</div></div>
-            <div class="stat-item"><div class="num">${counts['workout'] || 0}</div><div class="label">健身</div></div>
+            <div class="stat-item"><div class="num">${counts['rest'] || 0}</div><div class="label">休息</div></div>
         `;
 
         document.getElementById('goalDisplayText').innerText = `(目标: ${monthlyGoal} km)`;
