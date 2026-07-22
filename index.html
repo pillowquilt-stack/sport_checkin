@@ -9,8 +9,6 @@
     <style>
         /* ==========================================================
            1. 声明并引入中文字体：FuLuLingGanHeChaTi-2.ttf
-           注意：请确保该字体文件与此 HTML 文件放在 GitHub 
-           仓库的同一个文件夹（根目录）下。
            ========================================================== */
         @font-face {
             font-family: 'FuLuLingGanHeChaTi';
@@ -30,7 +28,6 @@
             --accent-color: #c88a59;
             --stamp-bg: #ffffff; 
             --day-font: 'Abel', sans-serif;
-            /* 将福禄灵感和茶体设为首选中文字体，并加入通用兜底字体 */
             --cn-font: 'FuLuLingGanHeChaTi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -64,8 +61,11 @@
             transition: all 0.3s ease;
         }
 
+        /* 顶部区域改为相对定位，方便右上角月份绝对定位 */
         .header {
             text-align: center;
+            position: relative;
+            margin-bottom: 10px;
         }
         .header h1 {
             font-size: 28px;
@@ -82,28 +82,36 @@
             font-weight: normal;
         }
 
+        /* 将月份切换模块移到右上角，大小与原图红圈装饰匹配 */
         .month-nav {
+            position: absolute;
+            top: 0;
+            right: 0;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 24px;
+            gap: 6px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 14px;
             color: var(--text-main);
             font-family: var(--day-font);
+            background: var(--cell-bg);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
         .month-nav button {
             background: none;
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
             color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 12px;
             transition: all 0.2s;
         }
         .month-nav button:hover {
@@ -466,12 +474,12 @@
     <div class="header">
         <h1>「人类丰荣计划」</h1>
         <p>/ 备战奥运</p>
-    </div>
-
-    <div class="month-nav">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="currentMonthYear">July 2026</span>
-        <button onclick="changeMonth(1)">›</button>
+        <!-- 月份切换模块移至右上角 -->
+        <div class="month-nav">
+            <button onclick="changeMonth(-1)">‹</button>
+            <span id="currentMonthYear">July 2026</span>
+            <button onclick="changeMonth(1)">›</button>
+        </div>
     </div>
 
     <div class="weekdays">
